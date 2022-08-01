@@ -10,7 +10,7 @@ const { lazyrouter } = require('express/lib/application');
 var hbs = require('express-handlebars')
 var fileUpload=require('express-fileupload')
 var db=require('./config/connection')
-
+var session=require('express-session')
 
 var app = express();
 
@@ -24,8 +24,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(fileUpload())
+app.use(session({secret:"Key",cookie:{maxAge:600000}}))
+app.use((req, res, next) => {
+res.set('Cache-Control', 'no-store')
+  next()
+})
+
 db.connect((err)=>{
   if (err) console.log('Connection Failed '+err)
   else console.log('Connected')
